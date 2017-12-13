@@ -1,0 +1,44 @@
+<ion-header>
+	<ion-navbar>
+		<ion-buttons end>
+		    <button ion-button icon-only (click)="addSelected($event, game)">
+		    	<ion-icon name="ios-add"></ion-icon>
+		    </button>
+		</ion-buttons>
+  	</ion-navbar>
+</ion-header>
+
+<ion-content>
+	<ion-card>
+		<img src="{{ game.imageURL }}"/>
+		<ion-card-content>
+
+		   	<ion-card-title>
+		    	<b>{{ game.title}}</b>
+		    </ion-card-title>
+
+		    <p>
+			    <span *ngIf="game.year">
+			    	<b>{{ game.year }}</b>
+			    </span>
+
+				<span *ngIf="game.year && game.platforms[0]">|</span>
+
+				<span *ngIf="game.platforms[0]">
+					<span *ngFor="let platform of game.platforms">
+			    		{{ platform }}
+			    	</span>
+				</span>
+			</p>
+
+		    <p *ngIf="game.subgenres[0]">
+		    	<span *ngFor="let subgenre of game.subgenres">
+			    	<ion-badge color="dark">
+			    		{{ subgenre }}
+			    	</ion-badge>
+		    	</span>
+			</p>
+
+		</ion-card-content>
+	</ion-card>
+</ion-content>
