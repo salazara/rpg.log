@@ -1,10 +1,28 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>Chat</ion-title>
-  </ion-navbar>
+	<ion-toolbar>
+    	<ion-buttons left>
+      		<button ion-button icon-only [disabled]="true">
+        		<ion-icon name="md-person"></ion-icon>
+      		</button>
+    	</ion-buttons>
+    	<ion-title>angelicosalazar</ion-title>
+    	<ion-buttons right>
+      		<button ion-button icon-only>
+        	<ion-icon name="md-arrow-dropdown"></ion-icon>
+      		</button>
+    	</ion-buttons>
+  	</ion-toolbar>
 </ion-header>
 
-
-<ion-content padding>
-<h1>Chit Chat</h1>
+<ion-content>
+	<div class="chatMessageInput">
+		<ion-toolbar>
+	    	<ion-input placeholder="Type a message..."></ion-input>
+	    	<ion-buttons right>
+	      		<button ion-button icon-only>
+	        	<ion-icon name="md-send"></ion-icon>
+	      		</button>
+	    	</ion-buttons>
+		</ion-toolbar>
+	</div>
 </ion-content>

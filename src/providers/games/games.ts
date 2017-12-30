@@ -15,12 +15,12 @@ export class GamesProvider {
 	}
 
 	requestBacklog(gamerID){
-		return this.http.get('http://localhost:8000/games/backlog/' + gamerID)
+		return this.http.get('http://localhost:8000/gamer/backlog/' + gamerID)
 			.map(res => res.json());
 	}
 
 	requestRecommendations(gamerID){
-		return this.http.get('http://localhost:8000/games/recommendations/' + gamerID)
+		return this.http.get('http://localhost:8000/gamer/recommendations/' + gamerID)
 			.map(res => res.json());
 	}
 

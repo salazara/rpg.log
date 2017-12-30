@@ -1,15 +1,26 @@
 <ion-header>
-	<ion-navbar>
-		<ion-searchbar 
-			(ionInput)="searchGames($event)"
-			showCancelButton="true"
-			debounce="500"
-			placeholder="Browse RPGs">
-		</ion-searchbar>
-  	</ion-navbar>
+	<ion-toolbar>
+    	<ion-buttons left>
+      		<button ion-button icon-only [disabled]="true">
+        		<ion-icon name="md-person"></ion-icon>
+      		</button>
+    	</ion-buttons>
+    	<ion-title>angelicosalazar</ion-title>
+    	<ion-buttons right>
+      		<button ion-button icon-only>
+        	<ion-icon name="md-arrow-dropdown"></ion-icon>
+      		</button>
+    	</ion-buttons>
+  	</ion-toolbar>
 </ion-header>
 
 <ion-content>
+	<ion-searchbar 
+		(ionInput)="searchGames($event)"
+		debounce="500"
+		placeholder="Browse RPGs"
+		class="searchbar">
+	</ion-searchbar>
 	<ion-list>
 	  	<ion-item *ngFor="let game of games" (click)="gameSelected(game)">
 	    	<h2>{{ game.title }}</h2>

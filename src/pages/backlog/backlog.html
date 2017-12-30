@@ -1,17 +1,28 @@
 <ion-header>
-	<ion-navbar>
-		<ion-segment [(ngModel)]="selected">
-	    	<ion-segment-button value="backlog">
-	    		BACKLOG
-	    	</ion-segment-button>
-	    	<ion-segment-button value="recommendations">
-	      		RECOMMENDATIONS
-	    	</ion-segment-button>
-		</ion-segment>
-	</ion-navbar>
+	<ion-toolbar>
+    	<ion-buttons left>
+      		<button ion-button icon-only [disabled]="true">
+        		<ion-icon name="md-person"></ion-icon>
+      		</button>
+    	</ion-buttons>
+    	<ion-title>angelicosalazar</ion-title>
+    	<ion-buttons right>
+      		<button ion-button icon-only>
+        	<ion-icon name="md-arrow-dropdown"></ion-icon>
+      		</button>
+    	</ion-buttons>
+  	</ion-toolbar>
 </ion-header>
 
 <ion-content [ngSwitch]="selected">
+	<ion-segment [(ngModel)]="selected" color="light" class="segment">
+	    <ion-segment-button value="backlog">
+	    	BACKLOG
+	    </ion-segment-button>
+	    <ion-segment-button value="recommendations">
+	   		RECOMMENDATIONS
+	   	</ion-segment-button>
+	</ion-segment>
 	<ion-list *ngSwitchCase="'backlog'">
 	  	<ion-item *ngFor="let game of backlog" (click)="gameSelected(game)">
 	    	<h2>{{ game.title }}</h2>
