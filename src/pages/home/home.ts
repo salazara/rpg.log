@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { ActionSheetController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
-import { Http } from '@angular/http';
-import 'rxjs/add/operator/map';
+import { ModalController } from 'ionic-angular';
 
+import { GamesProvider } from '../../providers/games/games';
 import { DetailPage } from '../detail/detail';
 
 @Component({
@@ -15,29 +15,41 @@ export class HomePage {
 
 	private games = [];
 	
-	constructor(public navCtrl: NavController, public actionSheetController : ActionSheetController, public alertController: AlertController, public http : Http){}
+	constructor(
+		public navController: NavController,
+		public actionSheetController : ActionSheetController,
+		public alertController: AlertController,
+		public modalController: ModalController,
+		public gamesProvider : GamesProvider) {
+
+	}
 	
-	getGames(input){
+	searchGames(input){
 
 		this.games = [];
+		
 		let searchTitle = input.target.value;
-
+		
 		if(searchTitle && searchTitle.length > 2){
-
-			this.http.get('http://localhost:8000/games/searchTitle/' + searchTitle).map(res => res.json()).subscribe(data => {
-
-	        	for(let i = 0 ; i < data.length ; i++)
-	        		this.games.push(data[i]);
-	    	});
+		
+			this.gamesProvider.requestGames(searchTitle)
+				.subscribe(
+					data => {
+	        			for(let i = 0 ; i < data.length ; i++)
+	        				this.games.push(data[i]);
+	    			}
+	    		);
 		}
 	}
 
 	gameSelected(game){
 
-  		this.navCtrl.push(DetailPage, { game: game });
+  		//this.navController.push(DetailPage, { game: game });
+  		let modal = this.modalController.create(DetailPage, {game: game});
+    	modal.present();
 	}
 
-	addSelected(event, game){
+	gameOptionsSelected(event, game){
 		
 		event.stopPropagation();
 	    
@@ -47,12 +59,22 @@ export class HomePage {
 	        {
 	        	text: 'Add to BACKLOG',
 	        	handler: () => {
-	        		alert('Backlog');
+	        		this.gamesProvider.requestAddToBacklog('5a2cb46df7171cf22ad98543', game._id)
+	        			.subscribe(
+	        				data => {
+	        					this.showAlert('Added to BACKLOG', game.title);
+	        				}
+	        			);
 	        	}
 	        },{
 	        	text: 'Add to RECOMMENDATIONS',
 	        	handler: () => {
-	        		alert('Recommendations');
+	        		this.gamesProvider.requestAddToRecommendations('5a2cb46df7171cf22ad98543', game._id)
+	        			.subscribe(
+	        				data => {
+	        					this.showAlert('Added to RECOMMENDATIONS', game.title);
+	        				}
+	        			);
 	        	}
 	        },{
 	        	text: 'Cancel',
@@ -61,5 +83,14 @@ export class HomePage {
 	      ]
 	    });
 	    actionSheet.present();
+	}
+
+	showAlert(title, gameTitle) {
+    	let alert = this.alertController.create({
+      		title: title,
+      		subTitle: gameTitle,
+      		buttons: ['OK']
+    	});
+    	alert.present();
 	}
 }
