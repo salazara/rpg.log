@@ -23,8 +23,9 @@ export class BacklogPage {
 
 	private firebaseUID = "";
 	private nickname = "";
-	private backlog;
-	private recommendations;
+	private backlog = null;
+	private recommendations = null;
+	private nicknameSubscription = null;
 
 	constructor(
 		public navController: NavController,
@@ -142,11 +143,13 @@ export class BacklogPage {
 				if(user && user.email && user.uid){
 
 					this.firebaseUID = user.uid;
-					this.angularFireDatabase.object('gamers/' + this.firebaseUID + '/nickname', { preserveSnapshot: true })
-	  					.take(1)
-	  					.subscribe(snapshot => {
-							this.nickname = snapshot.val();
-						});
+
+					this.nicknameSubscription = 
+						this.angularFireDatabase.object('gamers/' + this.firebaseUID + '/nickname', { preserveSnapshot: true })
+							.subscribe(snapshot => {
+								this.nickname = snapshot.val();
+							});
+		        	
 		        	this.backlog = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/backlog');
 		        	this.recommendations = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/recommendations');
 
@@ -155,5 +158,12 @@ export class BacklogPage {
 					this.firebaseUID = "";	
 				}
 			});
+	}
+
+	ionViewDidLeave() {
+
+		if(this.nicknameSubscription){
+			this.nicknameSubscription.unsubscribe();
+		}
 	}
 }

@@ -26,8 +26,18 @@
 </ion-header>
 
 <ion-content>
-	<ion-card *ngFor="let message of messages | async">
-		<ion-card-header>{{ message.nickname }}</ion-card-header>
-		<ion-card-content>{{ message.message }} </ion-card-content>
-	</ion-card>
+	<div id="messageSpace" *ngFor="let message of messages">
+		<ion-card *ngIf="message.firebaseUID == firebaseUID" class="myMessage">
+			<ion-card-content>
+				<h2><b>{{ message.nickname }}</b></h2>
+				<p>{{ message.message }}</p>
+			</ion-card-content>
+		</ion-card>
+		<ion-card *ngIf="message.firebaseUID != firebaseUID" class="theirMessage">
+			<ion-card-content>
+				<h2><b>{{ message.nickname }}</b></h2>
+				<p>{{ message.message }}</p>
+			</ion-card-content>
+		</ion-card>
+	</div>
 </ion-content>

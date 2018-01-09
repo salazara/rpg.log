@@ -3,4 +3,21 @@ page-chat {
 		background-color: #202020;
 		padding: 8px;
 	}
+	.myMessage {
+		background-color: #202020;
+		float:right;
+		width: 85%;
+		margin: 5px;
+	}
+	.myMessage * {
+		color: #ffffff;
+	}
+	.theirMessage {
+		float: left;
+		width: 85%;
+		margin: 5px;
+	}
+	.theirMessage * {
+		
+	}
 }
