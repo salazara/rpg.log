@@ -1,0 +1,23 @@
+<ion-header>
+	<ion-toolbar>
+    	<ion-title>RPG.log</ion-title>
+    	<ion-buttons right>
+      		<button ion-button icon-only [disabled]="true">
+        	<ion-icon name="ios-game-controller-b"></ion-icon>
+      		</button>
+    	</ion-buttons>
+  	</ion-toolbar>
+</ion-header>
+
+
+<ion-content padding>
+
+	<ion-input placeholder='Email' [(ngModel)]='user.email'></ion-input>
+	<ion-input placeholder='Password' [(ngModel)]='user.password' type="password"></ion-input>
+
+	<br/>
+
+	<button ion-button color='light' (click)='login(user)'>LOGIN</button>
+	<button ion-button color='light' (click)='register()'>REGISTER</button>
+
+</ion-content>

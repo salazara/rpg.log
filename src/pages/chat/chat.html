@@ -5,24 +5,29 @@
         		<ion-icon name="md-person"></ion-icon>
       		</button>
     	</ion-buttons>
-    	<ion-title>angelicosalazar</ion-title>
+    	<ion-title>{{ nickname }}</ion-title>
     	<ion-buttons right>
       		<button ion-button icon-only>
         	<ion-icon name="md-arrow-dropdown"></ion-icon>
       		</button>
     	</ion-buttons>
   	</ion-toolbar>
+  	<div class="chatMessageInput">
+		<ion-toolbar>
+		    <ion-input [(ngModel)]='message' placeholder="Type a message..." (keyup.enter)="sendMessage()"></ion-input>
+		    <ion-buttons right>
+		      	<button ion-button icon-only (click)="sendMessage()">
+		       	<ion-icon name="md-send"></ion-icon>
+		     	</button>
+		    </ion-buttons>
+		</ion-toolbar>
+	</div>
+
 </ion-header>
 
 <ion-content>
-	<div class="chatMessageInput">
-		<ion-toolbar>
-	    	<ion-input placeholder="Type a message..."></ion-input>
-	    	<ion-buttons right>
-	      		<button ion-button icon-only>
-	        	<ion-icon name="md-send"></ion-icon>
-	      		</button>
-	    	</ion-buttons>
-		</ion-toolbar>
-	</div>
+	<ion-card *ngFor="let message of messages | async">
+		<ion-card-header>{{ message.nickname }}</ion-card-header>
+		<ion-card-content>{{ message.message }} </ion-card-content>
+	</ion-card>
 </ion-content>

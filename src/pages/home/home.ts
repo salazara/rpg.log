@@ -4,8 +4,13 @@ import { ActionSheetController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { ModalController } from 'ionic-angular';
 
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
+import 'rxjs/add/operator/take';
+
 import { GamesProvider } from '../../providers/games/games';
 import { DetailPage } from '../detail/detail';
+
 
 @Component({
   selector: 'page-home',
@@ -13,14 +18,20 @@ import { DetailPage } from '../detail/detail';
 })
 export class HomePage {
 
+	private firebaseUID = "";
+	private nickname = "";
 	private games = [];
+	private backlog;
+	private recommendations;
 	
 	constructor(
 		public navController: NavController,
 		public actionSheetController : ActionSheetController,
 		public alertController: AlertController,
 		public modalController: ModalController,
-		public gamesProvider : GamesProvider) {
+		public gamesProvider : GamesProvider,
+		private angularFireAuth : AngularFireAuth,
+		private angularFireDatabase : AngularFireDatabase) {
 
 	}
 	
@@ -28,11 +39,11 @@ export class HomePage {
 
 		this.games = [];
 		
-		let searchTitle = input.target.value;
+		let title = input.target.value;
 		
-		if(searchTitle && searchTitle.length > 2){
+		if(title && title.length > 2){
 		
-			this.gamesProvider.requestGames(searchTitle)
+			this.gamesProvider.requestGamesByTitle(title)
 				.subscribe(
 					data => {
 	        			for(let i = 0 ; i < data.length ; i++)
@@ -44,7 +55,6 @@ export class HomePage {
 
 	gameSelected(game){
 
-  		//this.navController.push(DetailPage, { game: game });
   		let modal = this.modalController.create(DetailPage, {game: game});
     	modal.present();
 	}
@@ -59,22 +69,26 @@ export class HomePage {
 	        {
 	        	text: 'Add to BACKLOG',
 	        	handler: () => {
-	        		this.gamesProvider.requestAddToBacklog('5a2cb46df7171cf22ad98543', game._id)
-	        			.subscribe(
-	        				data => {
-	        					this.showAlert('Added to BACKLOG', game.title);
-	        				}
-	        			);
+	        		if(this.firebaseUID.length > 0){
+		  
+	        			this.backlog.update(game._id, game).then(result => {
+	        				this.showAlert('Added to BACKLOG', game.title);
+	        			});
+		        	} else {
+		        		this.showAlert('ERROR', 'You are not signed in.');
+	        		}
 	        	}
 	        },{
 	        	text: 'Add to RECOMMENDATIONS',
 	        	handler: () => {
-	        		this.gamesProvider.requestAddToRecommendations('5a2cb46df7171cf22ad98543', game._id)
-	        			.subscribe(
-	        				data => {
-	        					this.showAlert('Added to RECOMMENDATIONS', game.title);
-	        				}
-	        			);
+	        		if(this.firebaseUID.length > 0){
+
+	        			this.recommendations.update(game._id, game).then(result => {
+	        				this.showAlert('Added to RECOMMENDATIONS', game.title);
+	        			});
+		        	} else {
+		        		this.showAlert('ERROR', 'You are not signed in.');
+		        	}
 	        	}
 	        },{
 	        	text: 'Cancel',
@@ -85,12 +99,35 @@ export class HomePage {
 	    actionSheet.present();
 	}
 
-	showAlert(title, gameTitle) {
+	showAlert(title, subTitle) {
     	let alert = this.alertController.create({
       		title: title,
-      		subTitle: gameTitle,
+      		subTitle: subTitle,
       		buttons: ['OK']
     	});
     	alert.present();
+	}
+
+	ionViewDidEnter(){
+
+		this.angularFireAuth.authState
+			.take(1)
+			.subscribe(user => {
+				if(user && user.email && user.uid){
+
+					this.firebaseUID = user.uid;
+	  				this.angularFireDatabase.object('gamers/' + this.firebaseUID + '/nickname', { preserveSnapshot: true })
+	  					.take(1)
+	  					.subscribe(snapshot => {
+							this.nickname = snapshot.val();
+						});
+		        	this.backlog = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/backlog');
+		        	this.recommendations = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/recommendations');
+
+				} else {
+					
+					this.firebaseUID = "";
+				}
+			});
 	}
 }

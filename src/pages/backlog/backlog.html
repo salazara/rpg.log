@@ -5,17 +5,14 @@
         		<ion-icon name="md-person"></ion-icon>
       		</button>
     	</ion-buttons>
-    	<ion-title>angelicosalazar</ion-title>
+    	<ion-title>{{ nickname }}</ion-title>
     	<ion-buttons right>
       		<button ion-button icon-only>
-        	<ion-icon name="md-arrow-dropdown"></ion-icon>
+        		<ion-icon name="md-arrow-dropdown"></ion-icon>
       		</button>
     	</ion-buttons>
   	</ion-toolbar>
-</ion-header>
-
-<ion-content [ngSwitch]="selected">
-	<ion-segment [(ngModel)]="selected" color="light" class="segment">
+  	<ion-segment [(ngModel)]="selected" color="light" class="segment">
 	    <ion-segment-button value="backlog">
 	    	BACKLOG
 	    </ion-segment-button>
@@ -23,8 +20,11 @@
 	   		RECOMMENDATIONS
 	   	</ion-segment-button>
 	</ion-segment>
+</ion-header>
+
+<ion-content [ngSwitch]="selected">
 	<ion-list *ngSwitchCase="'backlog'">
-	  	<ion-item *ngFor="let game of backlog" (click)="gameSelected(game)">
+	  	<ion-item *ngFor="let game of backlog | async" (click)="gameSelected(game)">
 	    	<h2>{{ game.title }}</h2>
 	    	<p>
 	    		<b>{{ game.year }}</b>
@@ -37,7 +37,7 @@
 	  </ion-item>
 	</ion-list>
 	<ion-list *ngSwitchCase="'recommendations'">
-	  	<ion-item *ngFor="let game of recommendations" (click)="gameSelected(game)">
+	  	<ion-item *ngFor="let game of recommendations | async" (click)="gameSelected(game)">
 	    	<h2>{{ game.title }}</h2>
 	    	<p>
 	    		<b>{{ game.year }}</b>

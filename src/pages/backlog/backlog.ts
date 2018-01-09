@@ -5,6 +5,10 @@ import { ActionSheetController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
 import { Http } from '@angular/http';
 
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
+import 'rxjs/add/operator/take';
+
 import { GamesProvider } from '../../providers/games/games';
 import { DetailPage } from '../detail/detail';
 
@@ -16,8 +20,11 @@ import { DetailPage } from '../detail/detail';
 export class BacklogPage {
 
 	private selected = "backlog";
-	private backlog = [];
-	private recommendations = [];
+
+	private firebaseUID = "";
+	private nickname = "";
+	private backlog;
+	private recommendations;
 
 	constructor(
 		public navController: NavController,
@@ -25,13 +32,14 @@ export class BacklogPage {
 		public alertController: AlertController,
 		public actionSheetController: ActionSheetController,
 		public modalController: ModalController,
-		public gamesProvider : GamesProvider) {
+		public gamesProvider : GamesProvider,
+		private angularFireAuth : AngularFireAuth,
+		private angularFireDatabase : AngularFireDatabase) {
 
 	}
 
 	gameSelected(game){
 
-  		//this.navController.push(DetailPage, { game: game });
   		let modal = this.modalController.create(DetailPage, {game: game});
     	modal.present();
 	}
@@ -48,19 +56,29 @@ export class BacklogPage {
 		        	{
 		        		text: 'Remove from BACKLOG',
 		        		handler: () => {
-		        			this.gamesProvider.requestRemoveFromBacklog('5a2cb46df7171cf22ad98543', game._id)
-		        				.subscribe(
-		        					data => {
-			        					for(var i = 0 ; i < this.backlog.length ; i++){
-			        						if(this.backlog[i]._id == game._id){
-			        							this.backlog.splice(i, 1);	        		
-			        						}
-			        					}
-			        					this.showAlert('Removed from BACKLOG', game.title);
-			        				}
-			        			);
+		        			if(this.firebaseUID.length > 0){		  
+
+		        				this.backlog.remove(game._id).then(result => {
+			        				this.showAlert('Removed from BACKLOG', game.title);
+			        			});
+
+				        	} else {
+				        		this.showAlert('ERROR', 'You are not signed in.');
+			        		}
 			        	}
 		        	},{
+			        	text: 'Add to RECOMMENDATIONS',
+			        	handler: () => {
+			        		if(this.firebaseUID.length > 0){
+
+			        			this.recommendations.update(game._id, game).then(result => {
+			        				this.showAlert('Added to RECOMMENDATIONS', game.title);
+			        			});
+				        	} else {
+				        		this.showAlert('ERROR', 'You are not signed in.');
+				        	}
+			        	}
+	        		},{
 		        		text: 'Cancel',
 		        		role: 'cancel',
 		        	}
@@ -75,19 +93,29 @@ export class BacklogPage {
 		        	{
 		        		text: 'Remove from RECOMMENDATIONS',
 		        		handler: () => {
-		        			this.gamesProvider.requestRemoveFromRecommendations('5a2cb46df7171cf22ad98543', game._id)
-		        				.subscribe(
-		        					data => {
-						        		for(var i = 0 ; i < this.recommendations.length ; i++){
-						        			if(this.recommendations[i]._id == game._id){
-						        				this.recommendations.splice(i, 1);	        		
-						        			}
-						        		}
-						    			this.showAlert('Removed from RECOMMENDATIONS', game.title);
-					    			}
-		        				);
+		        			if(this.firebaseUID.length > 0){		  
+			
+								this.recommendations.remove(game._id).then(result => {
+			        				this.showAlert('Removed from RECOMMENDATIONS', game.title);
+			        			});
+
+				        	} else {
+				        		this.showAlert('ERROR', 'You are not signed in.');
+			        		}
 		        		}
 		        	},{
+			        	text: 'Add to BACKLOG',
+			        	handler: () => {
+			        		if(this.firebaseUID.length > 0){
+				  
+			        			this.backlog.update(game._id, game).then(result => {
+			        				this.showAlert('Added to BACKLOG', game.title);
+			        			});
+				        	} else {
+				        		this.showAlert('ERROR', 'You are not signed in.');
+			        		}
+			        	}
+	        		},{
 		        		text: 'Cancel',
 		        		role: 'cancel',
 		        	}
@@ -97,10 +125,10 @@ export class BacklogPage {
 	    }
 	}
 
-	showAlert(title, gameTitle) {
+	showAlert(title, subTitle) {
     	let alert = this.alertController.create({
       		title: title,
-      		subTitle: gameTitle,
+      		subTitle: subTitle,
       		buttons: ['OK']
     	});
     	alert.present();
@@ -108,23 +136,24 @@ export class BacklogPage {
 
 	ionViewDidEnter(){
 
-		this.backlog = [];
-		this.recommendations = [];
+		this.angularFireAuth.authState
+			.take(1)
+			.subscribe(user => {
+				if(user && user.email && user.uid){
 
-		this.gamesProvider.requestBacklog('5a2cb46df7171cf22ad98543')
-			.subscribe(
-				data => {	
-					for(let i = 0 ; i < data.length ; i++)
-		       			this.backlog.push(data[i]);
-		    	}
-		    );
+					this.firebaseUID = user.uid;
+					this.angularFireDatabase.object('gamers/' + this.firebaseUID + '/nickname', { preserveSnapshot: true })
+	  					.take(1)
+	  					.subscribe(snapshot => {
+							this.nickname = snapshot.val();
+						});
+		        	this.backlog = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/backlog');
+		        	this.recommendations = this.angularFireDatabase.list('gamers/' + this.firebaseUID + '/recommendations');
 
-		this.gamesProvider.requestRecommendations('5a2cb46df7171cf22ad98543')
-			.subscribe(
-				data => {	
-					for(let i = 0 ; i < data.length ; i++)
-		       			this.recommendations.push(data[i]);
-		    	}
-		    );
+				} else {
+
+					this.firebaseUID = "";	
+				}
+			});
 	}
 }
