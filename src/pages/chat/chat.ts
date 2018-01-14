@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
+import { App } from 'ionic-angular';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import 'rxjs/add/operator/take';
+
+import { LoginPage } from '../login/login';
 
 @IonicPage()
 @Component({
@@ -20,12 +23,26 @@ export class ChatPage {
 	private nicknameSubscription = null;
 
 	constructor(
-  		public navController: NavController,
-  		public navParams: NavParams,
+		private app: App,
+  		private navController: NavController,
+  		private navParams: NavParams,
   		private angularFireAuth: AngularFireAuth,
   		private angularFireDatabase: AngularFireDatabase) {
   	
   	}
+
+	logout(){
+
+		this.angularFireAuth.auth.signOut().then(() => {
+			if(this.nicknameSubscription){
+				this.nicknameSubscription.unsubscribe();
+			}
+			if(this.messagesSubscription){
+				this.messagesSubscription.unsubscribe();
+			}
+			this.app.getRootNav().setRoot(LoginPage);
+	    });
+	}
 
 	sendMessage(){
 
@@ -53,7 +70,7 @@ export class ChatPage {
 							});
 
 	  				this.messagesSubscription = 
-	  					this.angularFireDatabase.list('messages', { query: { limitToLast: 10 }, preserveSnapshot: true })
+	  					this.angularFireDatabase.list('messages', { query: { limitToLast: 20 }, preserveSnapshot: true })
 	  						.subscribe(snapshots => {
 		  						this.messages = [];
 		  						snapshots.forEach(snapshot => {

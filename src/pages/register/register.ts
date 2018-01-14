@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { AlertController } from 'ionic-angular';
 
 import { User } from '../../models/user';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -17,7 +18,8 @@ export class RegisterPage {
 	confirmPassword: string;
 
 	constructor(
-		public navController: NavController, 
+		public navController: NavController,
+		public alertController: AlertController,
 		public navParams: NavParams,
 		private angularFireAuth: AngularFireAuth,
 		public gamesProvider : GamesProvider) {
@@ -35,15 +37,27 @@ export class RegisterPage {
 				const createdUser = await this.angularFireAuth.auth.createUserWithEmailAndPassword(user.email, user.password);
 	        	
 	        	if(createdUser){
-	        		alert('Successful registration with ' + user.email);
+
+	        		this.showAlert('', 'Successful registration with ' + user.email);
+	        		this.navController.pop();
+
 				}
 
 			} catch (e) {
-				alert(e);
+				this.showAlert('', e);
 
 			}
 		} else {
-			alert('Error: The passwords do not match.');
+			this.showAlert('' ,'Error: The passwords do not match.');
 		}
+	}
+
+	showAlert(title, subTitle) {
+    	let alert = this.alertController.create({
+      		title: title,
+      		subTitle: subTitle,
+      		buttons: ['OK']
+    	});
+    	alert.present();
 	}
 }

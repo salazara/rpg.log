@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
+import { App } from 'ionic-angular';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { ModalController } from 'ionic-angular';
 import { ActionSheetController } from 'ionic-angular';
 import { AlertController } from 'ionic-angular';
-import { Http } from '@angular/http';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import 'rxjs/add/operator/take';
 
-import { GamesProvider } from '../../providers/games/games';
 import { DetailPage } from '../detail/detail';
+import { LoginPage } from '../login/login';
 
 @IonicPage()
 @Component({
@@ -20,7 +20,6 @@ import { DetailPage } from '../detail/detail';
 export class BacklogPage {
 
 	private selected = "backlog";
-
 	private firebaseUID = "";
 	private nickname = "";
 	private backlog = null;
@@ -28,15 +27,25 @@ export class BacklogPage {
 	private nicknameSubscription = null;
 
 	constructor(
-		public navController: NavController,
-		public navParams: NavParams,
-		public alertController: AlertController,
-		public actionSheetController: ActionSheetController,
-		public modalController: ModalController,
-		public gamesProvider : GamesProvider,
+		private app : App,
+		private navController: NavController,
+		private navParams: NavParams,
+		private alertController: AlertController,
+		private actionSheetController: ActionSheetController,
+		private modalController: ModalController,
 		private angularFireAuth : AngularFireAuth,
 		private angularFireDatabase : AngularFireDatabase) {
 
+	}
+
+	logout(){
+
+		this.angularFireAuth.auth.signOut().then(() => {
+			if(this.nicknameSubscription){
+				this.nicknameSubscription.unsubscribe();
+			}
+			this.app.getRootNav().setRoot(LoginPage);
+	    });
 	}
 
 	gameSelected(game){

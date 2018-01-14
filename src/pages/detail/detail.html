@@ -1,5 +1,5 @@
 <ion-header>
-	<ion-navbar>
+	<ion-navbar hideBackButton="true">
 		<ion-buttons end>
 		    <button ion-button icon-only (click)="dismiss()">
 		    	<ion-icon name="ios-close"></ion-icon>
@@ -38,6 +38,17 @@
 			    	</ion-badge>
 		    	</span>
 			</p>
+		</ion-card-content>
+	</ion-card>
+
+	<ion-card *ngIf="recommendedGame">
+		<ion-card-content>
+
+			<p>If you like <b>{{ game.title }}</b>, then you might also like..</p>
+
+			<ion-card-title (click)="viewRecommendedGame()">
+		    	<b>{{ recommendedGame.title}}</b>
+		    </ion-card-title>
 
 		</ion-card-content>
 	</ion-card>

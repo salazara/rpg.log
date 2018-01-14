@@ -54,7 +54,7 @@ export class LoginPage {
 
   		} catch (e) {
 
-  			alert(e);
+  			this.showAlert('', e);
   		}
   	}
 
@@ -75,11 +75,10 @@ export class LoginPage {
 	          			if(data.nickname && data.nickname.length > 0){
 	          				this.angularFireDatabase.object('gamers/' + firebaseUID + '/nickname').set(data.nickname)
 	          					.then(result => {
-	          						alert(data.nickname);
 	           		 				this.navController.setRoot(TabsPage);
 	          					});
 	           		 	} else {
-	           				alert('Please enter a nickname for your RPG.log account.');
+	           				this.showAlert('', 'Please enter a nickname for your RPG.log account.');
 	           				return false;
 	           		 	}
 	          		}
@@ -92,4 +91,13 @@ export class LoginPage {
   	register(){
   		this.navController.push(RegisterPage);
   	}
+
+  	showAlert(title, subTitle) {
+    	let alert = this.alertController.create({
+      		title: title,
+      		subTitle: subTitle,
+      		buttons: ['OK']
+    	});
+    	alert.present();
+	}
 }
